@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+
+  mysql-sisdb2025:
+    image: mysql:8.0
+    container_name: mysql-sisdb2025
+    restart: always
+    environment:
+      MYSQL_DATABASE: sisdb2025
+      MYSQL_ROOT_PASSWORD: abcd
+      MYSQL_USER: AppRoot
+      MYSQL_PASSWORD: abcd
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  autores:
+    build: ./autor-ms
+    container_name: autores
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql-sisdb2025
+      DB_PORT: 3306
+      DB_NAME: sisdb2025
+      DB_USER: AppRoot
+      DB_PWD: abcd
+    depends_on:
+      - mysql-sisdb2025
+
+  libros:
+    build: ./test
+    container_name: libros
+    ports:
+      - "8001:8001"
+    environment:
+      DB_HOST: mysql-sisdb2025
+      DB_PORT: 3306
+      DB_NAME: sisdb2025
+      DB_USER: AppRoot
+      DB_PWD: abcd
+    depends_on:
+      - mysql-sisdb2025
+      - autores
+
+volumes:
+  mysql_data:
